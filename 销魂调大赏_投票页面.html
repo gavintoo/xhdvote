@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏆 销魂调大赏 · 投票</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0e0e12;--card:#18181f;--card2:#1e1e28;--accent:#c8a45c;--accent2:#e8c96e;--text:#e8e4dc;--muted:#8a8690;--border:#2a2a35;--green:#3a8a5c;--gold:#ffd700;--silver:#c0c0c0;--bronze:#cd7f32;--red:#e74c3c}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:16px;max-width:860px;margin:0 auto}
+.hdr{text-align:center;padding:32px 0 20px;border-bottom:1px solid var(--border);margin-bottom:24px}
+.hdr h1{font-size:1.8em;color:var(--accent);letter-spacing:2px;margin-bottom:6px}
+.hdr .sub{color:var(--muted);font-size:.9em}
+.name-bar{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:12px 16px;background:var(--card);border-radius:10px;border:1px solid var(--border)}
+.name-bar label{color:var(--muted);font-size:.9em;white-space:nowrap}
+.name-bar input{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:.95em;outline:none}
+.name-bar input:focus{border-color:var(--accent)}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;margin-bottom:24px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s;border-radius:2px}
+.rules-toggle{color:var(--accent);cursor:pointer;font-size:.9em;margin-bottom:16px;user-select:none}
+.rules-toggle:hover{text-decoration:underline}
+.rules-box{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:20px;margin-bottom:24px;display:none}
+.rules-box.show{display:block}
+.rules-box h2{color:var(--accent);margin-bottom:12px;font-size:1.05em}
+.rules-box ul{list-style:none;padding:0}
+.rules-box li{padding:6px 0 6px 20px;position:relative;font-size:.9em}
+.rules-box li::before{content:'▸';position:absolute;left:0;color:var(--accent)}
+.rule-hl{background:rgba(200,164,92,.1);border-left:3px solid var(--accent);padding:12px 16px;margin:12px 0;border-radius:0 6px 6px 0;font-size:.9em}
+.rule-hl strong{color:var(--accent2)}
+.ph-tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.85em}
+.ph-tbl th{background:var(--card2);color:var(--accent);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+.ph-tbl td{padding:8px 10px;border-bottom:1px solid var(--border)}
+.sec-title{font-size:1.15em;color:var(--accent2);margin:28px 0 14px;padding-bottom:6px;border-bottom:2px solid var(--accent)}
+.award{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:18px}
+.award.r1{border-left:3px solid var(--accent)}
+.award.df{border-left:3px solid var(--green)}
+.aw-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px}
+.aw-nm{font-size:1.05em;font-weight:600}
+.badge{font-size:.72em;padding:2px 8px;border-radius:12px;font-weight:500}
+.badge-r1{background:rgba(200,164,92,.13);color:var(--accent);border:1px solid rgba(200,164,92,.25)}
+.badge-df{background:rgba(58,138,92,.13);color:#6fcf97;border:1px solid rgba(58,138,92,.25)}
+.vote-status{color:var(--muted);font-size:.8em;margin-bottom:10px}
+.vote-status .filled{color:var(--accent2)}
+.nm-tbl{width:100%;border-collapse:collapse;font-size:.88em}
+.nm-tbl th{text-align:left;color:var(--muted);font-weight:500;padding:5px 6px;border-bottom:1px solid var(--border);font-size:.82em}
+.nm-tbl td{padding:6px;border-bottom:1px solid rgba(42,42,53,.4)}
+.nm-tbl tr:last-child td{border-bottom:none}
+.nm-tbl tr:hover{background:rgba(200,164,92,.03)}
+.vbtn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--card2);cursor:pointer;font-size:.75em;transition:all .15s;user-select:none}
+.vbtn:hover{border-color:var(--muted)}
+.vbtn.disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
+.vbtn.sel-gold{background:rgba(255,215,0,.18);border-color:var(--gold);color:var(--gold)}
+.vbtn.sel-silver{background:rgba(192,192,192,.15);border-color:var(--silver);color:var(--silver)}
+.vbtn.sel-bronze{background:rgba(205,127,50,.15);border-color:var(--bronze);color:var(--bronze)}
+.vbtn.sel-pick{background:rgba(200,164,92,.18);border-color:var(--accent);color:var(--accent)}
+.sub-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#111;border:none;border-radius:10px;font-size:1em;font-weight:600;cursor:pointer;margin:24px 0;text-align:center;transition:opacity .2s}
+.sub-btn:hover{opacity:.9}
+.admin-link{text-align:center;padding:16px 0 8px;color:var(--muted);font-size:.8em;cursor:pointer;user-select:none}
+.admin-link:hover{color:var(--accent)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-bg.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:640px;width:100%;max-height:85vh;overflow-y:auto;position:relative}
+.modal h2{color:var(--accent);margin-bottom:14px;font-size:1.1em}
+.modal textarea{width:100%;min-height:100px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:.82em;resize:vertical;font-family:monospace}
+.modal textarea:focus{outline:none;border-color:var(--accent)}
+.modal-close{position:absolute;top:12px;right:16px;color:var(--muted);cursor:pointer;font-size:1.3em}
+.modal-close:hover{color:var(--text)}
+.modal-btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.modal-btns button{padding:8px 16px;border-radius:6px;border:1px solid var(--border);background:var(--card2);color:var(--text);cursor:pointer;font-size:.88em}
+.modal-btns button:hover{border-color:var(--accent)}
+.modal-btns button.primary{background:var(--accent);color:#111;border-color:var(--accent);font-weight:600}
+.modal-btns button.danger{background:var(--red);color:#fff;border-color:var(--red)}
+.result-tbl{width:100%;border-collapse:collapse;font-size:.85em;margin:10px 0}
+.result-tbl th{text-align:left;color:var(--accent);padding:6px 8px;border-bottom:1px solid var(--border);font-size:.82em}
+.result-tbl td{padding:6px 8px;border-bottom:1px solid rgba(42,42,53,.4)}
+.result-tbl tr.advance{background:rgba(200,164,92,.08)}
+.result-tbl tr.advance td:first-child{color:var(--accent)}
+.pwd-input{padding:8px 12px;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.95em;width:200px}
+.pwd-input:focus{outline:none;border-color:var(--accent)}
+.voter-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--card2);border-radius:6px;margin-bottom:6px;font-size:.88em}
+.voter-item .vname{color:var(--accent2)}
+.voter-item .del{color:var(--muted);cursor:pointer;font-size:.85em;padding:2px 8px;border-radius:4px}
+.voter-item .del:hover{color:var(--red);background:rgba(231,76,60,.1)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent);color:#111;padding:10px 24px;border-radius:8px;font-size:.9em;font-weight:600;z-index:200;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+@media(max-width:600px){body{padding:10px}.hdr h1{font-size:1.4em}.award{padding:12px}.nm-tbl{font-size:.78em}.vbtn{width:26px;height:26px;font-size:.7em}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+<script>
+const ADMIN_PWD='xht2025';
+const MAX_GOLD=1,MAX_SILVER=2,MAX_BRONZE=3;
+
+const AWARDS=[
+  {id:'cn_album',name:'年度华语专辑',icon:'💿',cat:'综合类奖项',round:1,
+    nm:[['如果每天都可以 happy happy','陳嫺靜'],['世界与孤独女王','祁紫檀'],['离开银色荒原','裘德'],['跟着感觉走','张震岳'],['羽毛剑','秦凡淇'],['过客','范晓萱 / 100%乐团'],['在雨后醒来','艾志恒Asen'],['Anti-People Pleaser','Chace'],['灰太阳','施鑫文月'],['Heal Me Good','Yufu'],['ADHD 贪吃蛇','小老虎'],['吴卫红','哥布林王子'],['云与万花筒','周士爵'],['Stigma','Green!Eyes'],['孤独金鱼图鉴','薛诒丹']]},
+  {id:'intl_album',name:'年度国际专辑',icon:'💿',cat:'综合类奖项',round:0,
+    nm:[["don't tap the glass",'Tyler the Creator'],['EUSEXUA','FKA twigs'],['Forever Howlong','BCNR'],['son of spergy','Daniel Caesar'],['Balloonerism','Mac Miller']]},
+  {id:'cn_rap',name:'说唱专辑',icon:'🎤',cat:'华语分类奖项',round:1,
+    nm:[['如果每天都可以 happy happy','陳嫺靜'],['人人都爱嘻哈乐','夏之禹/地磁卡'],['ADHD 贪吃蛇','小老虎'],['在雨后醒来','艾志恒Asen'],['都市醉漢','Vansdaddy / LusciousBB'],['羞于启齿','陈一豪'],['龙年','华云龙KLE-'],['钱专','河南说唱之神'],['生活麻辣烫','王齐铭WatchMe'],['HIMALOVER','The black birds等'],['吴卫红','哥布林王子'],['云与万花筒','周士爵'],['烹饪书','麻烦先生']]},
+  {id:'cn_urban',name:'都市律动专辑',icon:'🌙',cat:'华语分类奖项',round:1,
+    nm:[['Heal Me Good','YuFu'],["Don't Kill Tom",'黄业圆'],['松一口气！','回环'],['SAX TAPE','黄浩庭'],['东方美人','李英宏'],['月上伊甸','江上青山JasonYama'],['blu-night(蓝夜)','DEN'],['QUIT QUIETLY','落日飞车'],['CRÉMA','郑伟杰'],['孤独金鱼图鉴','薛诒丹']]},
+  {id:'cn_rock',name:'摇滚专辑',icon:'🎸',cat:'华语分类奖项',round:1,
+    nm:[['VOOID','VOOID'],['我们的样子','P.K.14'],['BRUTAL GIRL DELUSION','紅髮少年殺人事件'],['Sheep Out of the Box','NajaNaja'],['潮气吹过后山破庙时','丘瑙底河'],['巨人川','八仙 8Immortals'],['的夏日麽麽茶','夏日麼麼茶'],['//亵渎朋克摇滚','返校日'],['Mirror Chamber','KyoYoko'],['The Beneficial Society','The Beneficial Society'],['Stigma','Green!Eyes'],['Penta','Diner']]},
+  {id:'cn_elec',name:'电子 / 舞曲专辑',icon:'🎛️',cat:'华语分类奖项',round:1,
+    nm:[['Nomadelic','Taiga'],['ERA*','2z2'],['JUNGLE+','Yaka-'],['阳光，空气，还有水','超级市场'],['FLEETING HEARTS','FiFi Zhang'],['植物神经紊乱','ProN4c'],['Endless Summer','FiFi Rong'],['相识之泪','Shii'],['哦。','张彤禧Selina-'],['take us away','Dizparity / 王嘉仪']]},
+  {id:'cn_inst',name:'器乐 / 融合专辑',icon:'🎻',cat:'华语分类奖项',round:1,
+    nm:[['Patch','Fayzz'],['燃烧的石头','野孩子'],['Sun Moon Darkness 明日音','Mong Tong'],['Override!','Robot Swing'],['I Am Here','陶玙TAOTAO'],['回忆 Memory','IZ'],['凝视白色的边界','Cicada'],['下回上去','春麵樂隊ChuNoodle'],['Atavism返祖現象','Kuljelje Ljamcun'],['无尽的夏天','河边走'],['necessary fictions','gogo penguin']]},
+  {id:'cn_pop',name:'当代流行专辑',icon:'🎶',cat:'华语分类奖项',round:1,
+    nm:[['Anti-People Pleaser','Chace'],['世界与孤独女王','祁紫檀'],['灰太阳','施鑫文月'],['羽毛剑','秦凡淇'],['跟着感觉走','张震岳'],['过客','范晓萱 / 100%乐团'],['离开银色荒原','裘德'],['少女，飞','汉堡黄'],['仿生花','Whle'],['圆缺','郑宜农']]},
+  {id:'cn_folk',name:'民谣专辑',icon:'🌾',cat:'华语分类奖项',round:1,
+    nm:[['昂志范','卢江波'],['田野之花','穆静MU'],['海的尾巴','海尾巴'],['呼！','厨子和戏子'],['使风辑之"一支童谣换两个鸡蛋"','小河与寻谣计划'],['南方的冬','阿·依罗']]},
+  {id:'intl_rnb',name:'最佳国际 R&B / Soul 专辑',icon:'🌙',cat:'国际分类奖项',round:0,
+    nm:[['son of spergy','Daniel Caesar'],['essex honey','Blood Orange'],['SOS Deluxe: Luna','SZA'],['EUSEXUA','FKA twigs'],['Heal Me Good','yufu']]},
+  {id:'intl_hiphop',name:'最佳国际说唱 / Hip-hop 专辑',icon:'🎧',cat:'国际分类奖项',round:0,
+    nm:[["don't tap the glass",'Tyler the Creator'],['Balloonerism','Mac Miller'],['Magic, Alive!','McKinley Dixon'],['ujbeats:summer','Snail\'s House'],['The Most Dear and The Future','EAR']]},
+  {id:'intl_rock',name:'最佳国际摇滚 / 实验专辑',icon:'🔊',cat:'国际分类奖项',round:0,
+    nm:[['Forever Howlong','BCNR'],['Instant Holograms On Metal Film','Stereolab'],['double infinity','Big Thief'],['choke enough','oklou'],['Batakari','Ata Kak']]},
+  {id:'intl_elec',name:'最佳国际电子 / 实验专辑',icon:'🎛️',cat:'国际分类奖项',round:0,
+    nm:[['choke enough','oklou'],['ujbeats:summer','Snail\'s House'],['Under Tangled Silence','DjRUM'],['Shell~Wave','Surgeon'],['crystal','ATOLS'],['Ambient Work The Highways Of Los Angeles','Elijah Fox']]},
+  {id:'intl_pop',name:'最佳国际流行专辑',icon:'🌟',cat:'国际分类奖项',round:0,
+    nm:[['Hit Me Hard And Soft','Billie Eilish'],['LUX','ROSALÍA'],['The Life of a Showgirl','Taylor Swift'],['Apiary','Gingerbee'],['I Love My Computer','ninajirachi']]},
+  {id:'best_male',name:'年度最佳男音乐人',icon:'🎤',cat:'人物类奖项',round:0,
+    nm:[['Tyler the Creator',"don't tap the glass"],['Daniel Caesar','son of spergy'],['小老虎','ADHD 贪吃蛇'],['哥布林王子','吴卫红'],['张震岳','跟着感觉走']]},
+  {id:'best_female',name:'年度最佳女音乐人',icon:'🎤',cat:'人物类奖项',round:0,
+    nm:[['FKA twigs','EUSEXUA'],['Billie Eilish','Hit Me Hard And Soft'],['SZA','SOS Deluxe: Luna'],['ROSALÍA','LUX'],['陳嫺靜','如果每天都可以 happy happy']]},
+  {id:'best_band',name:'年度最佳乐队 / 组合',icon:'🎸',cat:'人物类奖项',round:0,
+    nm:[['VOOID','VOOID'],['夏日么么茶','的夏日麽麽茶'],['落日飞车','QUIT QUIETLY'],['BCNR','Forever Howlong'],['Big Thief','double infinity']]}
+];
+
+// ===== STATE =====
+let myName=localStorage.getItem('xht_name')||'';
+let myVotes=JSON.parse(localStorage.getItem('xht_votes3')||'{}');
+let allImported=JSON.parse(localStorage.getItem('xht_imported')||'[]');
+
+function save(){
+  localStorage.setItem('xht_name',myName);
+  localStorage.setItem('xht_votes3',JSON.stringify(myVotes));
+  localStorage.setItem('xht_imported',JSON.stringify(allImported));
+}
+
+function votedCount(){
+  return Object.keys(myVotes).filter(k=>{
+    const v=myVotes[k];
+    if(v.pick!==undefined)return true;
+    if(v.gold!==undefined)return true;
+    if(v.silver&&v.silver.length)return true;
+    if(v.bronze&&v.bronze.length)return true;
+    return false;
+  }).length;
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+// ===== COMPACT CODEC =====
+function encodeVotes(){
+  const d={v:myName,a:{}};
+  AWARDS.forEach(a=>{
+    const v=myVotes[a.id];if(!v)return;
+    const o={};
+    if(v.gold!==undefined)o.g=v.gold;
+    if(Array.isArray(v.silver)&&v.silver.length)o.s=v.silver;
+    if(Array.isArray(v.bronze)&&v.bronze.length)o.b=v.bronze;
+    if(v.pick!==undefined)o.p=v.pick;
+    d.a[a.id]=o;
+  });
+  return btoa(unescape(encodeURIComponent(JSON.stringify(d))));
+}
+function decodeVotes(code){
+  try{
+    const d=JSON.parse(decodeURIComponent(escape(atob(code))));
+    if(!d.v||!d.a)return null;
+    const result={voter:d.v,votes:{}};
+    for(const k in d.a){
+      const o=d.a[k];const v={};
+      if(o.g!==undefined)v.gold=o.g;
+      if(Array.isArray(o.s))v.silver=o.s;
+      if(Array.isArray(o.b))v.bronze=o.b;
+      if(o.p!==undefined)v.pick=o.p;
+      result.votes[k]=v;
+    }
+    return result;
+  }catch(e){return null}
+}
+
+// ===== RENDER =====
+function render(){
+  const cats=[...new Set(AWARDS.map(a=>a.cat))];
+  const total=AWARDS.length;
+  const done=votedCount();
+  const pct=Math.round(done/total*100);
+
+  let h=`
+  <div class="hdr"><h1>🏆 销魂调大赏</h1><div class="sub">投票</div></div>
+  <div class="name-bar"><label>投票人</label><input id="vname" value="${esc(myName)}" placeholder="输入你的名字"></div>
+  <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+  <div style="color:var(--muted);font-size:.82em;margin-bottom:16px">已投 ${done}/${total} 项</div>
+  <div class="rules-toggle" onclick="toggleRules()">📋 投票规则 ▾</div>
+  <div class="rules-box" id="rules">
+    <h2>投票规则</h2>
+    <ul>
+      <li><strong>两轮制：</strong>初选（筛出入围）→ 终审（决出获奖）</li>
+      <li><strong>初选范围：</strong>入围超过 5 张的奖项需初选，≤5 张直通终审</li>
+      <li><strong>终审名额：</strong>每个奖项最多 5 张晋级</li>
+      <li>没听过的可以不投，弃权完全 OK</li>
+      <li>并列第 5 时同时晋级</li>
+    </ul>
+    <div class="rule-hl">
+      <strong>🥇🥈🥉 初选投票：1-2-3 多选加权制</strong><br><br>
+      每人每个奖项：<br>
+      🥇 金牌 选 <strong>1</strong> 张 — 每张 3 分<br>
+      🥈 银牌 选 <strong>2</strong> 张 — 每张 2 分<br>
+      🥉 铜牌 选 <strong>3</strong> 张 — 每张 1 分<br><br>
+      按总分排名，取前 5 晋级终审。<br>
+      直通终审的奖项投 1 票即可。
+    </div>
+    <table class="ph-tbl">
+      <tr><th></th><th>初选（第一轮）</th><th>终审（第二轮）</th></tr>
+      <tr><td><strong>范围</strong></td><td>入围 &gt;5 张的奖项</td><td>全部 17 个奖项</td></tr>
+      <tr><td><strong>投票方式</strong></td><td>🥇×1 🥈×2 🥉×3 加权</td><td>每人选 1 张</td></tr>
+      <tr><td><strong>晋级规则</strong></td><td>总分前 5 进入终审</td><td>得票最高获奖</td></tr>
+    </table>
+  </div>`;
+
+  cats.forEach(cat=>{
+    h+=`<div class="sec-title">${cat}</div>`;
+    AWARDS.filter(a=>a.cat===cat).forEach(a=>h+=renderAward(a));
+  });
+
+  h+=`<button class="sub-btn" onclick="showExport()">📋 生成投票码</button>
+  <div class="admin-link" onclick="showAdmin()">⚙️ 管理员入口</div>`;
+
+  document.getElementById('app').innerHTML=h;
+  const inp=document.getElementById('vname');
+  if(inp)inp.oninput=()=>{myName=inp.value.trim();save()};
+}
+
+function renderAward(a){
+  const isR1=a.round===1||a.nm.length>5;
+  const cls=isR1?'r1':'df';
+  const badge=isR1?`<span class="badge badge-r1">需初选 · ${a.nm.length}入围 → 取5</span>`
+                    :`<span class="badge badge-df">直通终审 · ${a.nm.length}入围</span>`;
+
+  const v=myVotes[a.id]||{silver:[],bronze:[]};
+  if(!Array.isArray(v.silver))v.silver=[];
+  if(!Array.isArray(v.bronze))v.bronze=[];
+
+  let statusHtml='';
+  if(isR1){
+    const g=v.gold!==undefined?1:0;
+    const s=v.silver.length;
+    const b=v.bronze.length;
+    statusHtml=`<div class="vote-status">🥇 <span class="${g>=MAX_GOLD?'filled':''}">${g}</span>/${MAX_GOLD} &nbsp; 🥈 <span class="${s>=MAX_SILVER?'filled':''}">${s}</span>/${MAX_SILVER} &nbsp; 🥉 <span class="${b>=MAX_BRONZE?'filled':''}">${b}</span>/${MAX_BRONZE}</div>`;
+  }
+
+  let rows=a.nm.map((n,i)=>{
+    const album=n[0],artist=n[1];
+    let btns='';
+    if(isR1){
+      const gSel=v.gold===i;
+      const sSel=v.silver.includes(i);
+      const bSel=v.bronze.includes(i);
+      const gFull=v.gold!==undefined&&!gSel;
+      const sFull=v.silver.length>=MAX_SILVER&&!sSel;
+      const bFull=v.bronze.length>=MAX_BRONZE&&!bSel;
+      btns=`<td style="text-align:center"><span class="vbtn ${gSel?'sel-gold':''} ${gFull?'disabled':''}" data-a="${a.id}" data-r="gold" data-i="${i}">🥇</span></td>
+            <td style="text-align:center"><span class="vbtn ${sSel?'sel-silver':''} ${sFull?'disabled':''}" data-a="${a.id}" data-r="silver" data-i="${i}">🥈</span></td>
+            <td style="text-align:center"><span class="vbtn ${bSel?'sel-bronze':''} ${bFull?'disabled':''}" data-a="${a.id}" data-r="bronze" data-i="${i}">🥉</span></td>`;
+    } else {
+      const pSel=v.pick===i;
+      btns=`<td style="text-align:center"><span class="vbtn ${pSel?'sel-pick':''}" data-a="${a.id}" data-r="pick" data-i="${i}">✓</span></td>`;
+    }
+    return `<tr><td>${i+1}</td><td>《${esc(album)}》</td><td>${esc(artist)}</td>${btns}</tr>`;
+  }).join('');
+
+  const thBtns=isR1?'<th>🥇</th><th>🥈</th><th>🥉</th>':'<th>✓</th>';
+  return `<div class="award ${cls}" id="aw-${a.id}">
+    <div class="aw-hdr"><span class="aw-nm">${a.icon} ${a.name}</span>${badge}</div>
+    ${statusHtml}
+    <table class="nm-tbl"><tr><th>#</th><th>专辑</th><th>艺人</th>${thBtns}</tr>${rows}</table>
+  </div>`;
+}
+
+// ===== VOTING =====
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('.vbtn');
+  if(!btn||btn.classList.contains('disabled'))return;
+  const aid=btn.dataset.a,rank=btn.dataset.r,idx=+btn.dataset.i;
+  const a=AWARDS.find(x=>x.id===aid);if(!a)return;
+
+  let v=myVotes[aid];if(!v)v={silver:[],bronze:[]};
+  if(!Array.isArray(v.silver))v.silver=[];
+  if(!Array.isArray(v.bronze))v.bronze=[];
+
+  if(rank==='pick'){
+    v.pick=v.pick===idx?undefined:idx;
+  } else if(rank==='gold'){
+    if(v.gold===idx){delete v.gold}
+    else{v.silver=v.silver.filter(x=>x!==idx);v.bronze=v.bronze.filter(x=>x!==idx);v.gold=idx}
+  } else if(rank==='silver'){
+    if(v.silver.includes(idx)){v.silver=v.silver.filter(x=>x!==idx)}
+    else{if(v.silver.length>=MAX_SILVER)return;if(v.gold===idx)delete v.gold;v.bronze=v.bronze.filter(x=>x!==idx);v.silver.push(idx)}
+  } else if(rank==='bronze'){
+    if(v.bronze.includes(idx)){v.bronze=v.bronze.filter(x=>x!==idx)}
+    else{if(v.bronze.length>=MAX_BRONZE)return;if(v.gold===idx)delete v.gold;v.silver=v.silver.filter(x=>x!==idx);v.bronze.push(idx)}
+  }
+
+  const has=v.gold!==undefined||v.silver.length>0||v.bronze.length>0||v.pick!==undefined;
+  if(!has)delete myVotes[aid];else myVotes[aid]=v;
+  save();render();
+});
+
+function toggleRules(){document.getElementById('rules').classList.toggle('show')}
+
+// ===== EXPORT =====
+function showExport(){
+  if(!myName){alert('请先输入你的名字');return}
+  if(votedCount()===0){alert('你还没有投任何票哦');return}
+
+  const code=encodeVotes();
+
+  // Human readable
+  let hr=`【销魂调大赏 · ${esc(myName)} 的投票】\n\n`;
+  AWARDS.forEach(a=>{
+    const v=myVotes[a.id];if(!v)return;
+    const isR1=a.round===1||a.nm.length>5;
+    if(isR1){
+      const parts=[];
+      if(v.gold!==undefined)parts.push(`🥇${a.nm[v.gold][1]}`);
+      if(Array.isArray(v.silver))v.silver.forEach(i=>parts.push(`🥈${a.nm[i][1]}`));
+      if(Array.isArray(v.bronze))v.bronze.forEach(i=>parts.push(`🥉${a.nm[i][1]}`));
+      if(parts.length)hr+=`${a.name}：${parts.join(' ')}\n`;
+    } else {
+      if(v.pick!==undefined)hr+=`${a.name}：${a.nm[v.pick][1]}\n`;
+    }
+  });
+
+  showModal(`
+    <h2>📋 投票结果</h2>
+    <p style="color:var(--muted);font-size:.85em;margin-bottom:12px">投完票后复制投票码发给管理员，管理员凭此统计结果</p>
+    <div class="tabs">
+      <span class="tab active" onclick="switchTab(this,'t0')">投票码</span>
+      <span class="tab" onclick="switchTab(this,'t1')">群聊格式</span>
+      <span class="tab" onclick="switchTab(this,'t2')">JSON</span>
+    </div>
+    <div class="tab-panel show" id="t0">
+      <textarea readonly id="code-text">${esc(code)}</textarea>
+      <div class="modal-btns"><button class="primary" onclick="copyText('code-text')">复制投票码</button><span class="copy-ok" id="copied0">已复制!</span></div>
+      <p style="color:var(--muted);font-size:.8em;margin-top:6px">将此码发给管理员即可，管理员在后台粘贴导入</p>
+    </div>
+    <div class="tab-panel" id="t1">
+      <textarea readonly id="hr-text">${esc(hr)}</textarea>
+      <div class="modal-btns"><button class="primary" onclick="copyText('hr-text')">复制</button><span class="copy-ok" id="copied1">已复制!</span></div>
+    </div>
+    <div class="tab-panel" id="t2">
+      <textarea readonly id="json-text">${esc(JSON.stringify({voter:myName,votes:buildVotesObj()}))}</textarea>
+      <div class="modal-btns"><button class="primary" onclick="copyText('json-text')">复制</button><span class="copy-ok" id="copied2">已复制!</span></div>
+    </div>
+  `);
+}
+
+function buildVotesObj(){
+  const o={};
+  AWARDS.forEach(a=>{
+    const v=myVotes[a.id];if(!v)return;
+    const obj={};
+    if(v.gold!==undefined)obj.gold=v.gold;
+    if(Array.isArray(v.silver)&&v.silver.length)obj.silver=v.silver;
+    if(Array.isArray(v.bronze)&&v.bronze.length)obj.bronze=v.bronze;
+    if(v.pick!==undefined)obj.pick=v.pick;
+    o[a.id]=obj;
+  });
+  return o;
+}
+
+function switchTab(el,id){
+  el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  el.closest('.modal').querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+}
+
+function copyText(id){
+  const t=document.getElementById(id);
+  navigator.clipboard?navigator.clipboard.writeText(t.value).then(()=>showCopied(t)):(
+    t.select(),document.execCommand('copy'),showCopied(t)
+  );
+}
+function showCopied(t){
+  const ok=t.parentElement.querySelector('.copy-ok');
+  if(ok){ok.classList.add('show');setTimeout(()=>ok.classList.remove('show'),1500)}
+}
+
+// ===== ADMIN =====
+function showAdmin(){
+  showModal(`
+    <h2>🔒 管理员验证</h2>
+    <p style="color:var(--muted);font-size:.9em;margin-bottom:12px">输入密码查看统计结果</p>
+    <input class="pwd-input" type="password" id="pwd-input" placeholder="密码" onkeydown="if(event.key==='Enter')checkPwd()">
+    <div class="modal-btns" style="margin-top:12px"><button class="primary" onclick="checkPwd()">确认</button></div>
+  `);
+}
+
+function checkPwd(){
+  if(document.getElementById('pwd-input').value===ADMIN_PWD){closeModal();showAdminPanel()}
+  else document.getElementById('pwd-input').style.borderColor='var(--red)';
+}
+
+function showAdminPanel(){
+  // Build voter list
+  let voterListHtml='<h3 style="font-size:.95em;margin-bottom:8px">已收集的投票</h3>';
+  if(allImported.length===0){
+    voterListHtml+='<p style="color:var(--muted);font-size:.88em">暂无投票数据，请在下方导入</p>';
+  } else {
+    allImported.forEach((v,i)=>{
+      voterListHtml+=`<div class="voter-item"><span class="vname">${esc(v.voter||'匿名')}</span><span class="del" onclick="delVoter(${i})">删除</span></div>`;
+    });
+  }
+
+  // Build import section
+  let importHtml=`
+  <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
+  <h3 style="font-size:.95em;margin-bottom:8px">导入投票</h3>
+  <textarea id="import-area" placeholder="粘贴投票码或JSON，每行一份"></textarea>
+  <div class="modal-btns">
+    <button class="primary" onclick="doImport()">添加投票</button>
+    <button class="danger" onclick="clearImport()">清空全部</button>
+  </div>`;
+
+  // Build results
+  let resultsHtml='<hr style="border:none;border-top:1px solid var(--border);margin:20px 0"><h2 style="margin-bottom:4px">📊 统计结果</h2>';
+
+  // Collect all vote data: imported + current user's own
+  const allVoteData=[...allImported];
+  // Include current user's votes if they exist
+  if(myName && votedCount()>0){
+    allVoteData.push({voter:myName+'（本机）',votes:buildVotesObj()});
+  }
+
+  const totalVoters=allVoteData.length;
+  resultsHtml+=`<p style="color:var(--muted);font-size:.85em;margin-bottom:12px">共 ${totalVoters} 人投票</p>`;
+
+  AWARDS.forEach(a=>{
+    const isR1=a.round===1||a.nm.length>5;
+    const top5=isR1?5:a.nm.length;
+    const scores=a.nm.map((_,i)=>({idx:i,gold:0,silver:0,bronze:0,pick:0,total:0}));
+
+    allVoteData.forEach(vd=>{
+      const v=vd.votes&&vd.votes[a.id];if(!v)return;
+      if(v.gold!==undefined&&scores[v.gold])scores[v.gold].gold++;
+      if(Array.isArray(v.silver))v.silver.forEach(i=>{if(scores[i])scores[i].silver++});
+      else if(typeof v.silver==='number'&&scores[v.silver])scores[v.silver].silver++;
+      if(Array.isArray(v.bronze))v.bronze.forEach(i=>{if(scores[i])scores[i].bronze++});
+      else if(typeof v.bronze==='number'&&scores[v.bronze])scores[v.bronze].bronze++;
+      if(v.pick!==undefined&&scores[v.pick])scores[v.pick].pick++;
+    });
+
+    scores.forEach(s=>{s.total=s.gold*3+s.silver*2+s.bronze*1+s.pick*1});
+    scores.sort((a,b)=>b.total-a.total);
+
+    let cutoff=top5;
+    if(scores.length>top5&&scores[top5-1].total===scores[top5].total){
+      const tieScore=scores[top5-1].total;
+      cutoff=scores.filter(s=>s.total>=tieScore).length;
+    }
+
+    let rows=scores.map((s,rank)=>{
+      if(s.total===0&&rank>=cutoff)return '';
+      const n=a.nm[s.idx];
+      const adv=rank<cutoff?'advance':'';
+      return `<tr class="${adv}"><td>${rank<cutoff?'⬆':''} ${rank+1}</td><td>《${esc(n[0])}》</td><td>${esc(n[1])}</td><td><strong>${s.total}</strong></td>${isR1?`<td>${s.gold}</td><td>${s.silver}</td><td>${s.bronze}</td>`:`<td>${s.pick}</td>`}</tr>`;
+    }).join('');
+
+    const thExtra=isR1?'<th>🥇</th><th>🥈</th><th>🥉</th>':'<th>票</th>';
+    resultsHtml+=`<h3 style="color:var(--accent);margin:16px 0 8px">${a.icon} ${a.name}</h3>
+    <table class="result-tbl"><tr><th>#</th><th>专辑</th><th>艺人</th><th>总分</th>${thExtra}</tr>${rows}</table>`;
+  });
+
+  showModal(`
+    <h2>⚙️ 管理员面板</h2>
+    ${voterListHtml}
+    ${importHtml}
+    ${resultsHtml}
+  `);
+}
+
+function delVoter(idx){
+  if(confirm('确定删除 '+allImported[idx].voter+' 的投票？')){
+    allImported.splice(idx,1);save();closeModal();showAdminPanel();
+  }
+}
+
+function doImport(){
+  const txt=document.getElementById('import-area').value.trim();
+  if(!txt)return;
+  let added=0,errors=0;
+  txt.split('\n').forEach(line=>{
+    line=line.trim();if(!line)return;
+    // Try base64 vote code first
+    let d=decodeVotes(line);
+    if(!d){
+      // Try raw JSON
+      try{d=JSON.parse(line);if(!d.votes)d=null}catch(e){d=null}
+    }
+    if(d&&d.votes){allImported.push(d);added++}
+    else errors++;
+  });
+  save();
+  if(added>0){
+    toast(`成功导入 ${added} 份投票${errors>0?`，${errors} 份格式错误`:''}`);
+    closeModal();showAdminPanel();
+  } else {
+    alert('未找到有效投票数据，请检查格式');
+  }
+}
+
+function clearImport(){
+  if(confirm('确定清空所有已收集的投票？此操作不可恢复')){
+    allImported=[];save();closeModal();showAdminPanel();
+  }
+}
+
+// ===== MODAL =====
+let modalBg=null;
+function showModal(html){
+  if(modalBg)closeModal();
+  modalBg=document.createElement('div');
+  modalBg.className='modal-bg show';
+  modalBg.innerHTML=`<div class="modal"><span class="modal-close" onclick="closeModal()">×</span>${html}</div>`;
+  modalBg.addEventListener('click',e=>{if(e.target===modalBg)closeModal()});
+  document.body.appendChild(modalBg);
+}
+function closeModal(){if(modalBg){modalBg.remove();modalBg=null}}
+
+render();
+</script>
+</body>
+</html>
